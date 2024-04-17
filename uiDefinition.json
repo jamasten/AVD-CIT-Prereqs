@@ -23,6 +23,46 @@
                             }
                         },
                         {
+                            "name": "ResourceGroupsApi",
+                            "type": "Microsoft.Solutions.ArmApiControl",
+                            "request": {
+                                "method": "GET",
+                                "path": "[concat(steps('basics').resourceScope.subscription.id, '/resourceGroups?api-version=2021-04-01')]"
+                            }
+                        },
+                        {
+                            "name": "existingResourceGroup",
+                            "type": "Microsoft.Common.CheckBox",
+                            "visible": true,
+                            "label": "Use existing resource group?",
+                            "defaultValue": false,
+                            "toolTip": "Determine whether to use an existing resource group for the CIT prerequisite resources."
+                        },
+                        {
+                            "name": "resourceGroup",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Resource Group",
+                            "multiselect": false,
+                            "defaultValue": "",
+                            "toolTip": "Select the name of the existing resource group.",
+                            "filterPlaceholder": "",
+                            "defaultDescription": "",
+                            "constraints": {
+                                "allowedValues": "[map(steps('basics').ResourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                "required": true
+                            },
+                            "infoMessages": [],
+                            "visible": "[steps('basics').existingResourceGroup]"
+                        },
+                        {
+                            "name": "deployStorage",
+                            "type": "Microsoft.Common.CheckBox",
+                            "visible": true,
+                            "label": "Deploy a storage account for build artifacts?",
+                            "defaultValue": false,
+                            "toolTip": "Determine whether to deploy a storage account to store build artifacts for the image build."
+                        },
+                        {
                             "name": "names",
                             "type": "Microsoft.Common.Section",
                             "label": "Resource Names",
@@ -31,6 +71,7 @@
                                     "name": "resourceGroup",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Resource group",
+                                    "visible": "[not(steps('basics').existingResourceGroup)]",
                                     "toolTip": "Input a custom name for the shared services resource group.",
                                     "placeholder": "Example: rg-cit-dev-use",
                                     "constraints": {
@@ -74,6 +115,48 @@
                                         "regex": "^(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\\.-]{0,78}[a-zA-Z0-9])$",
                                         "validationMessage": "The value must be alphanumerics, underscores, hyphens, and periods. The value must start and end with an alphanumeric. The length must be 1 to 80 characters."
                                     }
+                                },
+                                {
+                                    "name": "storageAccountName_checkNameAvailability",
+                                    "type": "Microsoft.Solutions.ArmApiControl",
+                                    "request": {
+                                        "method": "POST",
+                                        "path": "[concat(steps('basics').resourceScope.subscription.id,'/providers/Microsoft.Storage/checkNameAvailability?api-version=2016-01-01')]",
+                                        "body": {
+                                            "name": "[steps('basics').names.storageAccountName]",
+                                            "type": "Microsoft.Storage/storageAccounts"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "storageAccountName_rePUT",
+                                    "type": "Microsoft.Solutions.ArmApiControl",
+                                    "request": {
+                                        "method": "GET",
+                                        "path": "[concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/',steps('basics').resourceScope.resourceGroup.name,'/providers/Microsoft.Storage/storageAccounts/',steps('basics').names.storageAccountName,'?api-version=2016-01-01')]",
+                                        "body": {}
+                                    }
+                                },
+                                {
+                                    "name": "storageAccountName",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "Storage account",
+                                    "defaultValue": "",
+                                    "toolTip": "The name of the storage account to store the build artifacts (optional). The value must be 24 characters or less. Special characters are not allowed. The value must be in lowercase.",
+                                    "constraints": {
+                                        "required": true,
+                                        "validations": [
+                                            {
+                                                "isValid": "[or(steps('basics').names.storageAccountName_checkNameAvailability.nameAvailable,equals(steps('basics').names.storageAccountName_checkNameAvailability.reason,'AlreadyExists'))]",
+                                                "message": "[steps('basics').names.storageAccountName_checkNameAvailability.message]"
+                                            },
+                                            {
+                                                "isValid": "[or(steps('basics').names.storageAccountName_checkNameAvailability.nameAvailable,equals(steps('basics').names.storageAccountName_rePUT.id,concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/',steps('basics').resourceScope.resourceGroup.name,'/providers/Microsoft.Storage/storageAccounts/',steps('basics').names.storageAccountName)),not(equals(steps('basics').names.storageAccountName_checkNameAvailability.reason,'AlreadyExists')))]",
+                                                "message": "[steps('basics').names.storageAccountName_checkNameAvailability.message]"
+                                            }
+                                        ]
+                                    },
+                                    "visible": true
                                 },
                                 {
                                     "name": "userAssignedIdentity",
@@ -273,6 +356,7 @@
             "parameters": {
                 "computeGalleryName": "[steps('basics').names.computeGallery]",
                 "deploymentScriptName": "[steps('basics').names.desploymentScript]",
+                "existingResourceGroupName": "[if(steps('basics').existingResourceGroup, steps('basics').resourceGroup, '')]",
                 "existingVirtualNetworkResourceId": "[steps('networking').virtualNetwork.id]",
                 "imageDefinitionIsAcceleratedNetworkSupported": "[steps('imageDefinition').supportsAcceleratedNetworking]",
                 "imageDefinitionIsHibernateSupported": "[steps('imageDefinition').supportsHibernation]",
@@ -282,6 +366,7 @@
                 "imagePublisher": "[steps('imageDefinition').publisher]",
                 "imageSku": "[steps('imageDefinition').sku]",
                 "resourceGroupName": "[steps('basics').names.resourceGroup]",
+                "storageAccountName": "[steps('basics').names.storageAccountName]",
                 "subnetName": "[steps('networking').subnet]",
                 "tags": "[steps('tags').tags]",
                 "userAssignedIdentityName": "[steps('basics').names.userAssignedIdentity]"
