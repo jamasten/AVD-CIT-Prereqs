@@ -156,7 +156,7 @@
                                             }
                                         ]
                                     },
-                                    "visible": true
+                                    "visible": "[steps('basics').deployStorage]"
                                 },
                                 {
                                     "name": "userAssignedIdentity",
