@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "15182403648615278100"
+      "templateHash": "14464469607388149586"
     }
   },
   "parameters": {
@@ -21,11 +21,17 @@
         "description": "The name of the deployment script for configuring an existing subnet."
       }
     },
+    "existingResourceGroupResourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of an existing resource group."
+      }
+    },
     "existingVirtualNetworkResourceId": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The resource ID of an existing virtual network. If choosing a private endpoint for the storage account, the virtual network should contain a DNS server with the appropriate conditional forwarder."
+        "description": "The resource ID of an existing virtual network."
       }
     },
     "imageDefinitionIsAcceleratedNetworkSupported": {
@@ -161,6 +167,7 @@
   },
   "resources": [
     {
+      "condition": "[empty(parameters('existingResourceGroupResourceId'))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "name": "[parameters('resourceGroupName')]",
@@ -189,7 +196,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('UserAssignedIdentity_{0}', parameters('timestamp'))]",
-      "resourceGroup": "[parameters('resourceGroupName')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -270,7 +277,7 @@
         "mode": "Incremental",
         "parameters": {
           "principalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
           "roleDefinitionId": {
             "value": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(variables('Roles')[range(0, length(variables('Roles')))[range(0, length(variables('Roles')))[copyIndex()]]].name, subscription().id))]"
@@ -310,14 +317,14 @@
       },
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(variables('Roles')[range(0, length(variables('Roles')))[range(0, length(variables('Roles')))[copyIndex()]]].name, subscription().id))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('ComputeGallery_{0}', parameters('timestamp'))]",
-      "resourceGroup": "[parameters('resourceGroupName')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -444,7 +451,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('NetworkPolicy_{0}', parameters('timestamp'))]",
-      "resourceGroup": "[parameters('resourceGroupName')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -467,7 +474,7 @@
             "value": "[parameters('timestamp')]"
           },
           "userAssignedIdentityResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
           },
           "virtualNetworkName": {
             "value": "[split(parameters('existingVirtualNetworkResourceId'), '/')[8]]"
@@ -542,14 +549,14 @@
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]",
         "roleAssignments",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('StorageAccount_{0}', parameters('timestamp'))]",
-      "resourceGroup": "[parameters('resourceGroupName')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -566,10 +573,10 @@
             "value": "[parameters('tags')]"
           },
           "userAssignedIdentityPrincipalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
           "userAssignedIdentityResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
           }
         },
         "template": {
@@ -654,7 +661,7 @@
       },
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
       ]
     }
   ]
