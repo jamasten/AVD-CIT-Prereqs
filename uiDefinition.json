@@ -162,7 +162,7 @@
                         {
                             "name": "securityType",
                             "type": "Microsoft.Common.DropDown",
-                            "visible": "[or(contains(steps('imageManagement').operatingSystem.versionSelection, 'g2'), contains(steps('imageManagement').operatingSystem.versionSelection, 'win11'))]",
+                            "visible": true,
                             "label": "Security type",
                             "defaultValue": "Standard",
                             "toolTip": "Security type refers to the different security features available for a virtual machine. Security features like Trusted launch and Confidential Virtual Machines help to improve the security of Azure generation 2 virtual machines. However, additional security features have some limitations, which include not supporting back up, managed disks, and ephemeral OS disks. Learn more about Trusted launch virtual machines at https://learn.microsoft.com/en-us/azure/virtual-machines/trusted-launch and Confidential virtual machines at https://learn.microsoft.com/en-us/azure/confidential-computing/confidential-vm-overview.",
@@ -207,14 +207,14 @@
                                 ],
                                 "required": true
                             },
-                            "visible": "[equals(steps('image').source.type, 'AzureMarketplace')]"
+                            "visible": true
                         },
                         {
                             "name": "offersApi",
                             "type": "Microsoft.Solutions.ArmApiControl",
                             "request": {
                                 "method": "GET",
-                                "path": "[concat(steps('basics').scope.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').scope.location.name, '/publishers/', steps('image').source.publisher, '/artifacttypes/vmimage/offers?api-version=2023-07-01')]"
+                                "path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').resourceScope.location.name, '/publishers/', steps('imageDefinition').publisher, '/artifacttypes/vmimage/offers?api-version=2023-07-01')]"
                             }
                         },
                         {
@@ -224,17 +224,17 @@
                             "defaultValue": "",
                             "toolTip": "Select the desired marketplace image offer.",
                             "constraints": {
-                                "allowedValues": "[map(steps('image').source.offersApi, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                "allowedValues": "[map(steps('imageDefinition').offersApi, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
                                 "required": true
                             },
-                            "visible": "[equals(steps('image').source.type, 'AzureMarketplace')]"
+                            "visible": true
                         },
                         {
                             "name": "skusApi",
                             "type": "Microsoft.Solutions.ArmApiControl",
                             "request": {
                                 "method": "GET",
-                                "path": "[concat(steps('basics').scope.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').scope.location.name, '/publishers/', steps('image').source.publisher, '/artifacttypes/vmimage/offers/', steps('image').source.offer, '/skus?api-version=2023-07-01')]"
+                                "path": "[concat(steps('basics').resourceGroup.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').resourceScope.location.name, '/publishers/', steps('imageDefinition').publisher, '/artifacttypes/vmimage/offers/', steps('imageDefinition').offer, '/skus?api-version=2023-07-01')]"
                             }
                         },
                         {
@@ -244,10 +244,10 @@
                             "defaultValue": "win11-22h2-avd",
                             "toolTip": "Select the desired marketplace image SKU.",
                             "constraints": {
-                                "allowedValues": "[map(steps('image').source.skusApi, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                "allowedValues": "[map(steps('imageDefinition').skusApi, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
                                 "required": true
                             },
-                            "visible": "[equals(steps('image').source.type, 'AzureMarketplace')]"
+                            "visible": true
                         }
                     ]
                 },
