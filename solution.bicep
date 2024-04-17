@@ -6,8 +6,8 @@ param computeGalleryName string
 @description('The name of the deployment script for configuring an existing subnet.')
 param deploymentScriptName string
 
-@description('The name of an existing resource group.')
-param existingResourceGroupName string
+@description('Determine whether to use an existing resource group.')
+param existingResourceGroup bool
 
 @description('The resource ID of an existing virtual network.')
 param existingVirtualNetworkResourceId string = ''
@@ -96,11 +96,7 @@ var Roles = [
   }
 ]
 
-resource rg_existing 'Microsoft.Resources/resourceGroups@2019-10-01' existing = if (!empty(existingResourceGroupName)) {
-  name: existingResourceGroupName
-}
-
-resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = if (empty(existingResourceGroupName)) {
+resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = if (!existingResourceGroup) {
   name: resourceGroupName
   location: location
   tags: contains(tags, 'Microsoft.Resources/resourceGroups') ? tags['Microsoft.Resources/resourceGroups'] : {}
@@ -121,12 +117,15 @@ resource roleDefinitions 'Microsoft.Authorization/roleDefinitions@2015-07-01' = 
 
 module userAssignedIdentity 'modules/userAssignedIdentity.bicep' = {
   name: 'UserAssignedIdentity_${timestamp}'
-  scope: empty(existingResourceGroupName) ? rg : rg_existing
+  scope: resourceGroup(resourceGroupName)
   params: {
     location: location
     name: userAssignedIdentityName
     tags: tags
   }
+  dependsOn: [
+    rg
+  ]
 }
 
 @batchSize(1)
@@ -137,11 +136,14 @@ module roleAssignments 'modules/roleAssignment.bicep' = [for i in range(0, lengt
     principalId: userAssignedIdentity.outputs.PrincipalId
     roleDefinitionId: roleDefinitions[i].id
   }
+  dependsOn: [
+    rg
+  ]
 }]
 
 module computeGallery 'modules/computeGallery.bicep' = {
   name: 'ComputeGallery_${timestamp}'
-  scope: empty(existingResourceGroupName) ? rg : rg_existing
+  scope: resourceGroup(resourceGroupName)
   params: {
     computeGalleryName: computeGalleryName
     imageDefinitionName: imageDefinitionName
@@ -154,11 +156,14 @@ module computeGallery 'modules/computeGallery.bicep' = {
     imageDefinitionIsAcceleratedNetworkSupported: imageDefinitionIsAcceleratedNetworkSupported
     imageDefinitionIsHibernateSupported: imageDefinitionIsHibernateSupported
   }
+  dependsOn: [
+    rg
+  ]
 }
 
 module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) && !(empty(existingVirtualNetworkResourceId))) {
   name: 'NetworkPolicy_${timestamp}'
-  scope: empty(existingResourceGroupName) ? rg : rg_existing
+  scope: resourceGroup(resourceGroupName)
   params: {
     deploymentScriptName: deploymentScriptName
     location: location
@@ -170,13 +175,14 @@ module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) &&
     virtualNetworkResourceGroupName: split(existingVirtualNetworkResourceId, '/')[4]
   }
   dependsOn: [
+    rg
     roleAssignments
   ]
 }
 
 module storage 'modules/storageAccount.bicep' = {
   name: 'StorageAccount_${timestamp}'
-  scope: empty(existingResourceGroupName) ? rg : rg_existing
+  scope: resourceGroup(resourceGroupName)
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -184,4 +190,7 @@ module storage 'modules/storageAccount.bicep' = {
     userAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
     userAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
   }
+  dependsOn: [
+    rg
+  ]
 }
