@@ -93,7 +93,7 @@ var Roles = [
 resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = {
   name: resourceGroupName
   location: location
-  tags: tags
+  tags: contains(tags, 'Microsoft.Resources/resourceGroups') ? tags['Microsoft.Resources/resourceGroups'] : {}
   properties: {}
 }
 
@@ -113,9 +113,9 @@ module userAssignedIdentity 'modules/userAssignedIdentity.bicep' = {
   name: 'UserAssignedIdentity_${timestamp}'
   scope: rg
   params: {
-    Location: location
-    Name: userAssignedIdentityName
-    Tags: tags
+    location: location
+    name: userAssignedIdentityName
+    tags: tags
   }
 }
 
@@ -124,8 +124,8 @@ module roleAssignments 'modules/roleAssignment.bicep' = [for i in range(0, lengt
   name: 'RoleAssignments_${i}_${timestamp}'
   scope: resourceGroup(Roles[i].resourceGroup)
   params: {
-    PrincipalId: userAssignedIdentity.outputs.PrincipalId
-    RoleDefinitionId: roleDefinitions[i].id
+    principalId: userAssignedIdentity.outputs.PrincipalId
+    roleDefinitionId: roleDefinitions[i].id
   }
 }]
 
@@ -133,16 +133,16 @@ module computeGallery 'modules/computeGallery.bicep' = {
   name: 'ComputeGallery_${timestamp}'
   scope: rg
   params: {
-    ComputeGalleryName: computeGalleryName
-    ImageDefinitionName: imageDefinitionName
-    ImageDefinitionSecurityType: imageDefinitionSecurityType
-    ImageOffer: imageOffer
-    ImagePublisher: imagePublisher
-    ImageSku: imageSku
-    Location: location
-    Tags: tags
-    ImageDefinitionIsAcceleratedNetworkSupported: imageDefinitionIsAcceleratedNetworkSupported
-    ImageDefinitionIsHibernateSupported: imageDefinitionIsHibernateSupported
+    computeGalleryName: computeGalleryName
+    imageDefinitionName: imageDefinitionName
+    imageDefinitionSecurityType: imageDefinitionSecurityType
+    imageOffer: imageOffer
+    imagePublisher: imagePublisher
+    imageSku: imageSku
+    location: location
+    tags: tags
+    imageDefinitionIsAcceleratedNetworkSupported: imageDefinitionIsAcceleratedNetworkSupported
+    imageDefinitionIsHibernateSupported: imageDefinitionIsHibernateSupported
   }
 }
 
@@ -150,14 +150,14 @@ module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) &&
   name: 'NetworkPolicy_${timestamp}'
   scope: rg
   params: {
-    DeploymentScriptName: deploymentScriptName
-    Location: location
-    SubnetName: subnetName
-    Tags: tags
-    Timestamp: timestamp
-    UserAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
-    VirtualNetworkName: split(existingVirtualNetworkResourceId, '/')[8]
-    VirtualNetworkResourceGroupName: split(existingVirtualNetworkResourceId, '/')[4]
+    deploymentScriptName: deploymentScriptName
+    location: location
+    subnetName: subnetName
+    tags: tags
+    timestamp: timestamp
+    userAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
+    virtualNetworkName: split(existingVirtualNetworkResourceId, '/')[8]
+    virtualNetworkResourceGroupName: split(existingVirtualNetworkResourceId, '/')[4]
   }
   dependsOn: [
     roleAssignments

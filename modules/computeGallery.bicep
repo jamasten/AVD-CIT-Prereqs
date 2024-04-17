@@ -1,51 +1,51 @@
-param ComputeGalleryName string
-param ImageDefinitionName string
-param ImageDefinitionIsAcceleratedNetworkSupported bool
-param ImageDefinitionIsHibernateSupported bool
-param ImageDefinitionSecurityType string
-param ImageOffer string
-param ImagePublisher string
-param ImageSku string
-param Location string
-param Tags object
+param computeGalleryName string
+param imageDefinitionName string
+param imageDefinitionIsAcceleratedNetworkSupported bool
+param imageDefinitionIsHibernateSupported bool
+param imageDefinitionSecurityType string
+param imageOffer string
+param imagePublisher string
+param imageSku string
+param location string
+param tags object
 
 resource gallery 'Microsoft.Compute/galleries@2022-01-03' = {
-  name: ComputeGalleryName
-  location: Location
-  tags: Tags
+  name: computeGalleryName
+  location: location
+  tags: contains(tags, 'Microsoft.Compute/galleries') ? tags['Microsoft.Compute/galleries'] : {}
 }
 
 resource image 'Microsoft.Compute/galleries/images@2022-01-03' = {
   parent: gallery
-  name: ImageDefinitionName
-  location: Location
-  tags: Tags
+  name: imageDefinitionName
+  location: location
+  tags: contains(tags, 'Microsoft.Compute/galleries') ? tags['Microsoft.Compute/galleries'] : {}
   properties: {
     osType: 'Windows'
     osState: 'Generalized'
-    hyperVGeneration: contains(ImageSku, '-g2') || contains(ImageSku, 'win11-') ? 'V2' : 'V1'
+    hyperVGeneration: contains(imageSku, '-g2') || contains(imageSku, 'win11-') ? 'V2' : 'V1'
     identifier: {
-      publisher: ImagePublisher
-      offer: ImageOffer
-      sku: ImageSku
+      publisher: imagePublisher
+      offer: imageOffer
+      sku: imageSku
     }
-    features: ImageDefinitionSecurityType == 'Standard'
+    features: imageDefinitionSecurityType == 'Standard'
       ? null
       : [
           {
             name: 'SecurityType'
-            value: ImageDefinitionSecurityType
+            value: imageDefinitionSecurityType
           }
           {
             name: 'IsAcceleratedNetworkSupported'
-            value: string(ImageDefinitionIsAcceleratedNetworkSupported)
+            value: string(imageDefinitionIsAcceleratedNetworkSupported)
           }
           {
             name: 'IsHibernateSupported'
-            value: string(ImageDefinitionIsHibernateSupported)
+            value: string(imageDefinitionIsHibernateSupported)
           }
         ]
   }
 }
 
-output ImageDefinitionResourceId string = image.id
+output imageDefinitionResourceId string = image.id

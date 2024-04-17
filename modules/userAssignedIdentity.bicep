@@ -1,11 +1,11 @@
-param Location string
-param Name string
-param Tags object
+param location string
+param name string
+param tags object
 
 resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: Name
-  location: Location
-  tags: Tags
+  name: name
+  location: location
+  tags: contains(tags, 'Microsoft.ManagedIdentity/userAssignedIdentities') ? tags['Microsoft.ManagedIdentity/userAssignedIdentities'] : {}
 }
 
 output PrincipalId string = userAssignedIdentity.properties.principalId

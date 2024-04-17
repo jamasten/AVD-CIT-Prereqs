@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "1026475081810626628"
+      "templateHash": "5270940398680844809"
     }
   },
   "parameters": {
@@ -170,7 +170,7 @@
       "apiVersion": "2019-10-01",
       "name": "[parameters('resourceGroupName')]",
       "location": "[parameters('location')]",
-      "tags": "[parameters('tags')]",
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Resources/resourceGroups'), parameters('tags')['Microsoft.Resources/resourceGroups'], createObject())]",
       "properties": {}
     },
     {
@@ -201,13 +201,13 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "Location": {
+          "location": {
             "value": "[parameters('location')]"
           },
-          "Name": {
+          "name": {
             "value": "[parameters('userAssignedIdentityName')]"
           },
-          "Tags": {
+          "tags": {
             "value": "[parameters('tags')]"
           }
         },
@@ -218,17 +218,17 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "6018659098110995141"
+              "templateHash": "11344531216923935290"
             }
           },
           "parameters": {
-            "Location": {
+            "location": {
               "type": "string"
             },
-            "Name": {
+            "name": {
               "type": "string"
             },
-            "Tags": {
+            "tags": {
               "type": "object"
             }
           },
@@ -236,19 +236,19 @@
             {
               "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
               "apiVersion": "2018-11-30",
-              "name": "[parameters('Name')]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]"
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
             }
           ],
           "outputs": {
             "PrincipalId": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('Name')), '2018-11-30').principalId]"
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name')), '2018-11-30').principalId]"
             },
             "ResourceId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('Name'))]"
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name'))]"
             }
           }
         }
@@ -274,10 +274,10 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "PrincipalId": {
+          "principalId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
-          "RoleDefinitionId": {
+          "roleDefinitionId": {
             "value": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(variables('Roles')[range(0, length(variables('Roles')))[range(0, length(variables('Roles')))[copyIndex()]]].name, subscription().id))]"
           }
         },
@@ -292,10 +292,10 @@
             }
           },
           "parameters": {
-            "PrincipalId": {
+            "principalId": {
               "type": "string"
             },
-            "RoleDefinitionId": {
+            "roleDefinitionId": {
               "type": "string"
             }
           },
@@ -303,10 +303,10 @@
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-10-01-preview",
-              "name": "[guid(parameters('PrincipalId'), parameters('RoleDefinitionId'), resourceGroup().id)]",
+              "name": "[guid(parameters('principalId'), parameters('roleDefinitionId'), resourceGroup().id)]",
               "properties": {
-                "roleDefinitionId": "[parameters('RoleDefinitionId')]",
-                "principalId": "[parameters('PrincipalId')]",
+                "roleDefinitionId": "[parameters('roleDefinitionId')]",
+                "principalId": "[parameters('principalId')]",
                 "principalType": "ServicePrincipal"
               }
             }
@@ -329,34 +329,34 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "ComputeGalleryName": {
+          "computeGalleryName": {
             "value": "[parameters('computeGalleryName')]"
           },
-          "ImageDefinitionName": {
+          "imageDefinitionName": {
             "value": "[parameters('imageDefinitionName')]"
           },
-          "ImageDefinitionSecurityType": {
+          "imageDefinitionSecurityType": {
             "value": "[parameters('imageDefinitionSecurityType')]"
           },
-          "ImageOffer": {
+          "imageOffer": {
             "value": "[parameters('imageOffer')]"
           },
-          "ImagePublisher": {
+          "imagePublisher": {
             "value": "[parameters('imagePublisher')]"
           },
-          "ImageSku": {
+          "imageSku": {
             "value": "[parameters('imageSku')]"
           },
-          "Location": {
+          "location": {
             "value": "[parameters('location')]"
           },
-          "Tags": {
+          "tags": {
             "value": "[parameters('tags')]"
           },
-          "ImageDefinitionIsAcceleratedNetworkSupported": {
+          "imageDefinitionIsAcceleratedNetworkSupported": {
             "value": "[parameters('imageDefinitionIsAcceleratedNetworkSupported')]"
           },
-          "ImageDefinitionIsHibernateSupported": {
+          "imageDefinitionIsHibernateSupported": {
             "value": "[parameters('imageDefinitionIsHibernateSupported')]"
           }
         },
@@ -367,38 +367,38 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "9235275359623094237"
+              "templateHash": "18125111140340337922"
             }
           },
           "parameters": {
-            "ComputeGalleryName": {
+            "computeGalleryName": {
               "type": "string"
             },
-            "ImageDefinitionName": {
+            "imageDefinitionName": {
               "type": "string"
             },
-            "ImageDefinitionIsAcceleratedNetworkSupported": {
+            "imageDefinitionIsAcceleratedNetworkSupported": {
               "type": "bool"
             },
-            "ImageDefinitionIsHibernateSupported": {
+            "imageDefinitionIsHibernateSupported": {
               "type": "bool"
             },
-            "ImageDefinitionSecurityType": {
+            "imageDefinitionSecurityType": {
               "type": "string"
             },
-            "ImageOffer": {
+            "imageOffer": {
               "type": "string"
             },
-            "ImagePublisher": {
+            "imagePublisher": {
               "type": "string"
             },
-            "ImageSku": {
+            "imageSku": {
               "type": "string"
             },
-            "Location": {
+            "location": {
               "type": "string"
             },
-            "Tags": {
+            "tags": {
               "type": "object"
             }
           },
@@ -406,36 +406,36 @@
             {
               "type": "Microsoft.Compute/galleries",
               "apiVersion": "2022-01-03",
-              "name": "[parameters('ComputeGalleryName')]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]"
+              "name": "[parameters('computeGalleryName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/galleries'), parameters('tags')['Microsoft.Compute/galleries'], createObject())]"
             },
             {
               "type": "Microsoft.Compute/galleries/images",
               "apiVersion": "2022-01-03",
-              "name": "[format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageDefinitionName'))]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "name": "[format('{0}/{1}', parameters('computeGalleryName'), parameters('imageDefinitionName'))]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/galleries'), parameters('tags')['Microsoft.Compute/galleries'], createObject())]",
               "properties": {
                 "osType": "Windows",
                 "osState": "Generalized",
-                "hyperVGeneration": "[if(or(contains(parameters('ImageSku'), '-g2'), contains(parameters('ImageSku'), 'win11-')), 'V2', 'V1')]",
+                "hyperVGeneration": "[if(or(contains(parameters('imageSku'), '-g2'), contains(parameters('imageSku'), 'win11-')), 'V2', 'V1')]",
                 "identifier": {
-                  "publisher": "[parameters('ImagePublisher')]",
-                  "offer": "[parameters('ImageOffer')]",
-                  "sku": "[parameters('ImageSku')]"
+                  "publisher": "[parameters('imagePublisher')]",
+                  "offer": "[parameters('imageOffer')]",
+                  "sku": "[parameters('imageSku')]"
                 },
-                "features": "[if(equals(parameters('ImageDefinitionSecurityType'), 'Standard'), null(), createArray(createObject('name', 'SecurityType', 'value', parameters('ImageDefinitionSecurityType')), createObject('name', 'IsAcceleratedNetworkSupported', 'value', string(parameters('ImageDefinitionIsAcceleratedNetworkSupported'))), createObject('name', 'IsHibernateSupported', 'value', string(parameters('ImageDefinitionIsHibernateSupported')))))]"
+                "features": "[if(equals(parameters('imageDefinitionSecurityType'), 'Standard'), null(), createArray(createObject('name', 'SecurityType', 'value', parameters('imageDefinitionSecurityType')), createObject('name', 'IsAcceleratedNetworkSupported', 'value', string(parameters('imageDefinitionIsAcceleratedNetworkSupported'))), createObject('name', 'IsHibernateSupported', 'value', string(parameters('imageDefinitionIsHibernateSupported')))))]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/galleries', parameters('ComputeGalleryName'))]"
+                "[resourceId('Microsoft.Compute/galleries', parameters('computeGalleryName'))]"
               ]
             }
           ],
           "outputs": {
-            "ImageDefinitionResourceId": {
+            "imageDefinitionResourceId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Compute/galleries/images', parameters('ComputeGalleryName'), parameters('ImageDefinitionName'))]"
+              "value": "[resourceId('Microsoft.Compute/galleries/images', parameters('computeGalleryName'), parameters('imageDefinitionName'))]"
             }
           }
         }
@@ -456,28 +456,28 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "DeploymentScriptName": {
+          "deploymentScriptName": {
             "value": "[parameters('deploymentScriptName')]"
           },
-          "Location": {
+          "location": {
             "value": "[parameters('location')]"
           },
-          "SubnetName": {
+          "subnetName": {
             "value": "[parameters('subnetName')]"
           },
-          "Tags": {
+          "tags": {
             "value": "[parameters('tags')]"
           },
-          "Timestamp": {
+          "timestamp": {
             "value": "[parameters('timestamp')]"
           },
-          "UserAssignedIdentityResourceId": {
+          "userAssignedIdentityResourceId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
           },
-          "VirtualNetworkName": {
+          "virtualNetworkName": {
             "value": "[split(parameters('existingVirtualNetworkResourceId'), '/')[8]]"
           },
-          "VirtualNetworkResourceGroupName": {
+          "virtualNetworkResourceGroupName": {
             "value": "[split(parameters('existingVirtualNetworkResourceId'), '/')[4]]"
           }
         },
@@ -488,32 +488,32 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "14007046128732702855"
+              "templateHash": "12716907704714282300"
             }
           },
           "parameters": {
-            "DeploymentScriptName": {
+            "deploymentScriptName": {
               "type": "string"
             },
-            "Location": {
+            "location": {
               "type": "string"
             },
-            "SubnetName": {
+            "subnetName": {
               "type": "string"
             },
-            "Tags": {
+            "tags": {
               "type": "object"
             },
-            "Timestamp": {
+            "timestamp": {
               "type": "string"
             },
-            "UserAssignedIdentityResourceId": {
+            "userAssignedIdentityResourceId": {
               "type": "string"
             },
-            "VirtualNetworkName": {
+            "virtualNetworkName": {
               "type": "string"
             },
-            "VirtualNetworkResourceGroupName": {
+            "virtualNetworkResourceGroupName": {
               "type": "string"
             }
           },
@@ -521,21 +521,21 @@
             {
               "type": "Microsoft.Resources/deploymentScripts",
               "apiVersion": "2020-10-01",
-              "name": "[parameters('DeploymentScriptName')]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "name": "[parameters('deploymentScriptName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Resources/deploymentScripts'), parameters('tags')['Microsoft.Resources/deploymentScripts'], createObject())]",
               "kind": "AzurePowerShell",
               "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
-                  "[format('{0}', parameters('UserAssignedIdentityResourceId'))]": {}
+                  "[format('{0}', parameters('userAssignedIdentityResourceId'))]": {}
                 }
               },
               "properties": {
-                "arguments": "[format('-Subnet {0} -VirtualNetwork {1} -ResourceGroup {2}', parameters('SubnetName'), parameters('VirtualNetworkName'), parameters('VirtualNetworkResourceGroupName'))]",
+                "arguments": "[format('-Subnet {0} -VirtualNetwork {1} -ResourceGroup {2}', parameters('subnetName'), parameters('virtualNetworkName'), parameters('virtualNetworkResourceGroupName'))]",
                 "azPowerShellVersion": "9.4",
                 "cleanupPreference": "Always",
-                "forceUpdateTag": "[parameters('Timestamp')]",
+                "forceUpdateTag": "[parameters('timestamp')]",
                 "retentionInterval": "PT2H",
                 "scriptContent": "Param([string]$ResourceGroup, [string]$Subnet, [string]$VirtualNetwork); $VNET = Get-AzVirtualNetwork -Name $VirtualNetwork -ResourceGroupName $ResourceGroup; ($VNET | Select-Object -ExpandProperty \"Subnets\" | Where-Object {$_.Name -eq $Subnet}).privateLinkServiceNetworkPolicies = \"Disabled\"; $VNET | Set-AzVirtualNetwork",
                 "timeout": "PT30M"

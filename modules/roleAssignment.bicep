@@ -1,11 +1,11 @@
-param PrincipalId string
-param RoleDefinitionId string
+param principalId string
+param roleDefinitionId string
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(PrincipalId, RoleDefinitionId, resourceGroup().id)
+  name: guid(principalId, roleDefinitionId, resourceGroup().id)
   properties: {
-    roleDefinitionId: RoleDefinitionId
-    principalId: PrincipalId
+    roleDefinitionId: roleDefinitionId
+    principalId: principalId
     principalType: 'ServicePrincipal'
   }
 }
