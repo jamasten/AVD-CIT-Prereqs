@@ -234,7 +234,7 @@
                             "type": "Microsoft.Solutions.ArmApiControl",
                             "request": {
                                 "method": "GET",
-                                "path": "[concat(steps('basics').resourceGroup.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').resourceScope.location.name, '/publishers/', steps('imageDefinition').publisher, '/artifacttypes/vmimage/offers/', steps('imageDefinition').offer, '/skus?api-version=2023-07-01')]"
+                                "path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Compute/locations/', steps('basics').resourceScope.location.name, '/publishers/', steps('imageDefinition').publisher, '/artifacttypes/vmimage/offers/', steps('imageDefinition').offer, '/skus?api-version=2023-07-01')]"
                             }
                         },
                         {
