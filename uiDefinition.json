@@ -142,6 +142,7 @@
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Storage account",
                                     "defaultValue": "",
+                                    "placeholder": "Example: sacitdevuse",
                                     "toolTip": "The name of the storage account to store the build artifacts (optional). The value must be 24 characters or less. Special characters are not allowed. The value must be in lowercase.",
                                     "constraints": {
                                         "required": true,
