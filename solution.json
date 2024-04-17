@@ -5,20 +5,18 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "5270940398680844809"
+      "templateHash": "15182403648615278100"
     }
   },
   "parameters": {
     "computeGalleryName": {
       "type": "string",
-      "defaultValue": "cg_aib_d_use",
       "metadata": {
         "description": "The name of the compute gallery for managing the images."
       }
     },
     "deploymentScriptName": {
       "type": "string",
-      "defaultValue": "ds-aib-d-use",
       "metadata": {
         "description": "The name of the deployment script for configuring an existing subnet."
       }
@@ -32,7 +30,6 @@
     },
     "imageDefinitionIsAcceleratedNetworkSupported": {
       "type": "bool",
-      "defaultValue": true,
       "metadata": {
         "description": "Indicates whether the image definition supports accelerated networking."
       }
@@ -45,14 +42,12 @@
     },
     "imageDefinitionName": {
       "type": "string",
-      "defaultValue": "Win11-22h2-avd",
       "metadata": {
         "description": "The name of the Image Definition for the Shared Image Gallery."
       }
     },
     "imageDefinitionSecurityType": {
       "type": "string",
-      "defaultValue": "TrustedLaunch",
       "allowedValues": [
         "ConfidentialVM",
         "ConfidentialVMSupported",
@@ -65,21 +60,18 @@
     },
     "imageOffer": {
       "type": "string",
-      "defaultValue": "windows-11",
       "metadata": {
         "description": "The offer of the marketplace image."
       }
     },
     "imagePublisher": {
       "type": "string",
-      "defaultValue": "microsoftwindowsdesktop",
       "metadata": {
         "description": "The publisher of the marketplace image."
       }
     },
     "imageSku": {
       "type": "string",
-      "defaultValue": "win11-22h2-avd",
       "metadata": {
         "description": "The SKU of the marketplace image."
       }
@@ -93,14 +85,18 @@
     },
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "rg-aib-d-use",
       "metadata": {
         "description": "The name of the resource group for the resources."
       }
     },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the storage account for the imaging artifacts."
+      }
+    },
     "subnetName": {
       "type": "string",
-      "defaultValue": "Clients",
       "metadata": {
         "description": "The subnet name of an existing virtual network."
       }
@@ -121,7 +117,6 @@
     },
     "userAssignedIdentityName": {
       "type": "string",
-      "defaultValue": "uai-aib-d-use",
       "metadata": {
         "description": "The name for the user assigned identity"
       }
@@ -547,6 +542,118 @@
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]",
         "roleAssignments",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('StorageAccount_{0}', parameters('timestamp'))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "userAssignedIdentityPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+          },
+          "userAssignedIdentityResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "9347345461195623887"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "userAssignedIdentityPrincipalId": {
+              "type": "string"
+            },
+            "userAssignedIdentityResourceId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "tags": "[if(contains(parameters('tags'), 'Microsoft.Storage/storageAccounts'), parameters('tags')['Microsoft.Storage/storageAccounts'], createObject())]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('userAssignedIdentityResourceId'))]": {}
+                }
+              },
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "properties": {
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": false,
+                "allowCrossTenantReplication": false,
+                "allowedCopyScope": "AAD",
+                "allowSharedKeyAccess": true,
+                "defaultToOAuthAuthentication": false,
+                "dnsEndpointType": "Standard",
+                "minimumTlsVersion": "TLS1_2",
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": [],
+                  "ipRules": [],
+                  "defaultAction": "Allow"
+                },
+                "publicNetworkAccess": "Allow",
+                "supportsHttpsTrafficOnly": true
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAccountName'))]",
+              "name": "[guid(parameters('userAssignedIdentityPrincipalId'), '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1', resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')))]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1')]",
+                "principalId": "[parameters('userAssignedIdentityPrincipalId')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('resourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentity_{0}', parameters('timestamp')))]"
       ]
     }

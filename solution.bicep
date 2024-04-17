@@ -1,22 +1,22 @@
 targetScope = 'subscription'
 
 @description('The name of the compute gallery for managing the images.')
-param computeGalleryName string = 'cg_aib_d_use'
+param computeGalleryName string
 
 @description('The name of the deployment script for configuring an existing subnet.')
-param deploymentScriptName string = 'ds-aib-d-use'
+param deploymentScriptName string
 
 @description('The resource ID of an existing virtual network. If choosing a private endpoint for the storage account, the virtual network should contain a DNS server with the appropriate conditional forwarder.')
 param existingVirtualNetworkResourceId string = ''
 
 @description('Indicates whether the image definition supports accelerated networking.')
-param imageDefinitionIsAcceleratedNetworkSupported bool = true
+param imageDefinitionIsAcceleratedNetworkSupported bool
 
 @description('Indicates whether the image definition supports hibernation.')
 param imageDefinitionIsHibernateSupported bool
 
 @description('The name of the Image Definition for the Shared Image Gallery.')
-param imageDefinitionName string = 'Win11-22h2-avd'
+param imageDefinitionName string
 
 @allowed([
   'ConfidentialVM'
@@ -25,25 +25,28 @@ param imageDefinitionName string = 'Win11-22h2-avd'
   'TrustedLaunch'
 ])
 @description('The security type for the Image Definition.')
-param imageDefinitionSecurityType string = 'TrustedLaunch'
+param imageDefinitionSecurityType string
 
 @description('The offer of the marketplace image.')
-param imageOffer string = 'windows-11'
+param imageOffer string
 
 @description('The publisher of the marketplace image.')
-param imagePublisher string = 'microsoftwindowsdesktop'
+param imagePublisher string
 
 @description('The SKU of the marketplace image.')
-param imageSku string = 'win11-22h2-avd'
+param imageSku string
 
 @description('The location for the resources deployed in this solution.')
 param location string = deployment().location
 
 @description('The name of the resource group for the resources.')
-param resourceGroupName string = 'rg-aib-d-use'
+param resourceGroupName string
+
+@description('The name of the storage account for the imaging artifacts.')
+param storageAccountName string
 
 @description('The subnet name of an existing virtual network.')
-param subnetName string = 'Clients'
+param subnetName string
 
 @description('The key-value pairs of tags for the resources.')
 param tags object = {}
@@ -52,7 +55,7 @@ param tags object = {}
 param timestamp string = utcNow('yyyyMMddhhmmss')
 
 @description('The name for the user assigned identity')
-param userAssignedIdentityName string = 'uai-aib-d-use'
+param userAssignedIdentityName string
 
 var Roles = [
   {
@@ -162,4 +165,16 @@ module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) &&
   dependsOn: [
     roleAssignments
   ]
+}
+
+module storage 'modules/storageAccount.bicep' = {
+  name: 'StorageAccount_${timestamp}'
+  scope: rg
+  params: {
+    location: location
+    storageAccountName: storageAccountName
+    tags: tags
+    userAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
+    userAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
+  }
 }
