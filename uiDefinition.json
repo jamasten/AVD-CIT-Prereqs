@@ -32,7 +32,7 @@
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Resource group",
                                     "toolTip": "Input a custom name for the shared services resource group.",
-                                    "placeholder": "Example: rg-avd-shared-services",
+                                    "placeholder": "Example: rg-cit-dev-use",
                                     "constraints": {
                                         "required": true,
                                         "regex": "^(?!.*[\\.]$)[a-zA-Z0-9_\\.()-]{1,90}$",
@@ -44,7 +44,7 @@
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Compute gallery",
                                     "toolTip": "Input a custom name for the Azure Compute Gallery.",
-                                    "placeholder": "Example: gal_avd",
+                                    "placeholder": "Example: gal_dev_use",
                                     "constraints": {
                                         "required": true,
                                         "regex": "^(?:[a-zA-Z0-9]|[a-z0-9A-Z][a-z0-9A-Z_\\.]{0,78}[a-z0-9A-Z])$",
@@ -52,11 +52,23 @@
                                     }
                                 },
                                 {
+                                    "name": "desploymentScript",
+                                    "type": "Microsoft.Common.TextBox",
+                                    "label": "Deployment script",
+                                    "toolTip": "Input a custom name for the Deployment Script.",
+                                    "placeholder": "Example: ds-cit-dev-use",
+                                    "constraints": {
+                                        "required": true,
+                                        "regex": "^[a-zA-Z0-9][a-zA-Z0-9_-]{2,127}$",
+                                        "validationMessage": "The value must contain alphanumerics, hyphens, and underscores. The value must start with a letter or number. The length must be 3 to 128 characters."
+                                    }
+                                },
+                                {
                                     "name": "imageDefinition",
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "Image definition",
                                     "toolTip": "Input a custom name for the Image Definition in the Compute Gallery.",
-                                    "placeholder": "Example: avd_win11_21h2",
+                                    "placeholder": "Example: win11-21h2-m365-avd-officeworkers",
                                     "constraints": {
                                         "required": true,
                                         "regex": "^(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\\.-]{0,78}[a-zA-Z0-9])$",
@@ -68,7 +80,7 @@
                                     "type": "Microsoft.Common.TextBox",
                                     "label": "User assigned identity",
                                     "toolTip": "Input a custom name for the User Assigned Identity.",
-                                    "placeholder": "Example: id-aib",
+                                    "placeholder": "Example: id-cit-dev-use",
                                     "constraints": {
                                         "required": true,
                                         "regex": "^[a-zA-Z0-9][a-zA-Z0-9_-]{2,127}$",
