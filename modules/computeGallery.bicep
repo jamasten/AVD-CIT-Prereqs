@@ -1,0 +1,51 @@
+param ComputeGalleryName string
+param ImageDefinitionName string
+param ImageDefinitionIsAcceleratedNetworkSupported bool
+param ImageDefinitionIsHibernateSupported bool
+param ImageDefinitionSecurityType string
+param ImageOffer string
+param ImagePublisher string
+param ImageSku string
+param Location string
+param Tags object
+
+resource gallery 'Microsoft.Compute/galleries@2022-01-03' = {
+  name: ComputeGalleryName
+  location: Location
+  tags: Tags
+}
+
+resource image 'Microsoft.Compute/galleries/images@2022-01-03' = {
+  parent: gallery
+  name: ImageDefinitionName
+  location: Location
+  tags: Tags
+  properties: {
+    osType: 'Windows'
+    osState: 'Generalized'
+    hyperVGeneration: contains(ImageSku, '-g2') || contains(ImageSku, 'win11-') ? 'V2' : 'V1'
+    identifier: {
+      publisher: ImagePublisher
+      offer: ImageOffer
+      sku: ImageSku
+    }
+    features: ImageDefinitionSecurityType == 'Standard'
+      ? null
+      : [
+          {
+            name: 'SecurityType'
+            value: ImageDefinitionSecurityType
+          }
+          {
+            name: 'IsAcceleratedNetworkSupported'
+            value: string(ImageDefinitionIsAcceleratedNetworkSupported)
+          }
+          {
+            name: 'IsHibernateSupported'
+            value: string(ImageDefinitionIsHibernateSupported)
+          }
+        ]
+  }
+}
+
+output ImageDefinitionResourceId string = image.id
