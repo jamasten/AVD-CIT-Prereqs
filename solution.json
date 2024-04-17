@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "12110929976070921105"
+      "templateHash": "12773947217646681454"
     }
   },
   "parameters": {
@@ -588,7 +588,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "12875643972398071730"
+              "templateHash": "13234143440769168366"
             }
           },
           "parameters": {
@@ -643,6 +643,25 @@
                 "publicNetworkAccess": "Enabled",
                 "supportsHttpsTrafficOnly": true
               }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2021-09-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2021-09-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', 'artifacts')]",
+              "properties": {
+                "publicAccess": "None"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+              ]
             },
             {
               "type": "Microsoft.Authorization/roleAssignments",

@@ -38,6 +38,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   }
 }
 
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2021-09-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-09-01' = {
+  parent: blobService
+  name: 'artifacts'
+  properties: {
+    publicAccess: 'None'
+  }
+}
+
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
   name: guid(userAssignedIdentityPrincipalId, '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1', storageAccount.id)
   scope: storageAccount
