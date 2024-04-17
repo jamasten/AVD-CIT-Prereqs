@@ -357,7 +357,7 @@
             "parameters": {
                 "computeGalleryName": "[steps('basics').names.computeGallery]",
                 "deploymentScriptName": "[steps('basics').names.desploymentScript]",
-                "existingResourceGroupName": "[steps('basics').existingResourceGroup]",
+                "existingResourceGroup": "[steps('basics').existingResourceGroup]",
                 "existingVirtualNetworkResourceId": "[steps('networking').virtualNetwork.id]",
                 "imageDefinitionIsAcceleratedNetworkSupported": "[steps('imageDefinition').supportsAcceleratedNetworking]",
                 "imageDefinitionIsHibernateSupported": "[steps('imageDefinition').supportsHibernation]",
