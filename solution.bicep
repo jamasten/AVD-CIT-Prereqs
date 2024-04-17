@@ -43,7 +43,7 @@ param imageSku string
 param location string = deployment().location
 
 @description('The name of the resource group for the resources.')
-param resourceGroupName string
+param resourceGroupName string = 'rg-cit-dev-use'
 
 @description('The name of the storage account for the imaging artifacts.')
 param storageAccountName string

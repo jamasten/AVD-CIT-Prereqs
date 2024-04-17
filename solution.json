@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "15132272640429450645"
+      "templateHash": "16157859388663565233"
     }
   },
   "parameters": {
@@ -91,6 +91,7 @@
     },
     "resourceGroupName": {
       "type": "string",
+      "defaultValue": "rg-cit-dev-use",
       "metadata": {
         "description": "The name of the resource group for the resources."
       }
