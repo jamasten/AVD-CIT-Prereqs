@@ -53,13 +53,11 @@ az deployment sub create \
     --location '<Azure location>' \
     --template-uri 'https://raw.githubusercontent.com/jamasten/AVD-CIT-Prereqs/main/solution.json'
 ````
-
----
-# Deployment Example
+## Deployment Example
 
 The following will provide you a quick walk-through with a deployment.
 
-## Basics
+### Basics
 
 Under **Instance details**:
 
@@ -78,7 +76,7 @@ Under **Resource Names**:
 
 Click **Next**.
 
-## Networking
+### Networking
 
 1. Select `Enable custom virtual network`.  This is to setup the Virtual Network setup for AIB/CIT Build VMs.
 2. Select the `Virtual Network`.
@@ -86,7 +84,7 @@ Click **Next**.
 
 Click **Next**.
 
-## Image Definition
+### Image Definition
 
 1. If desired, select `Supports network acceleration`.
 2. If desired, select `Supports hibernation`.
@@ -97,12 +95,12 @@ Click **Next**.
 
 Click **Next**.
 
-## Tags
+### Tags
 
 Enter the appropriate `Tags` for the environment.
 
 Click **Next**.
 
-## Review + Create
+### Review + Create
 
 Review the options you have selected and click `Create`.
