@@ -19,12 +19,12 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     name: 'Standard_LRS'
   }
   properties: {
-    accessTier: 'Hot'
+    accessTier: 'Cool'
     allowBlobPublicAccess: false
     allowCrossTenantReplication: false
     allowedCopyScope: 'AAD'
-    allowSharedKeyAccess: true
-    defaultToOAuthAuthentication: false
+    allowSharedKeyAccess: false
+    defaultToOAuthAuthentication: true
     dnsEndpointType: 'Standard'
     minimumTlsVersion: 'TLS1_2'
     networkAcls: {
