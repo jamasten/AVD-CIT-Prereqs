@@ -17,13 +17,14 @@
                                     "Microsoft.Compute/galleries",
                                     "Microsoft.ManagedIdentity/userAssignedIdentities",
                                     "Microsoft.Resources/deploymentScripts",
-                                    "Microsoft.Resources/resourceGroups"
+                                    "Microsoft.Resources/resourceGroups",
+                                    "Microsoft.Storage/storageAccounts"
                                 ],
                                 "allowedValues": []
                             }
                         },
                         {
-                            "name": "ResourceGroupsApi",
+                            "name": "resourceGroupsApi",
                             "type": "Microsoft.Solutions.ArmApiControl",
                             "request": {
                                 "method": "GET",
@@ -48,7 +49,7 @@
                             "filterPlaceholder": "",
                             "defaultDescription": "",
                             "constraints": {
-                                "allowedValues": "[map(steps('basics').ResourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+                                "allowedValues": "[map(steps('basics').resourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
                                 "required": true
                             },
                             "infoMessages": [],
@@ -346,7 +347,8 @@
                                 "Microsoft.Compute/galleries",
                                 "Microsoft.ManagedIdentity/userAssignedIdentities",
                                 "Microsoft.Resources/deploymentScripts",
-                                "Microsoft.Resources/resourceGroups"
+                                "Microsoft.Resources/resourceGroups",
+                                "Microsoft.Storage/storageAccounts"
                             ]
                         }
                     ]
