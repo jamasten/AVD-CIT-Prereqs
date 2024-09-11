@@ -11,7 +11,7 @@ param virtualNetworkResourceGroupName string
 resource deploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: deploymentScriptName
   location: location
-  tags: contains(tags, 'Microsoft.Resources/deploymentScripts') ? tags['Microsoft.Resources/deploymentScripts'] : {}
+  tags: tags[?'Microsoft.Resources/deploymentScripts'] ?? {}
   kind: 'AzurePowerShell'
   identity: {
     type: 'UserAssigned'

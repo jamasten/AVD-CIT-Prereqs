@@ -7,7 +7,7 @@ param userAssignedIdentityResourceId string
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageAccountName
   location: location
-  tags: contains(tags, 'Microsoft.Storage/storageAccounts') ? tags['Microsoft.Storage/storageAccounts'] : {}
+  tags: tags[?'Microsoft.Storage/storageAccounts'] ?? {}
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {

@@ -12,14 +12,14 @@ param tags object
 resource gallery 'Microsoft.Compute/galleries@2022-01-03' = {
   name: computeGalleryName
   location: location
-  tags: contains(tags, 'Microsoft.Compute/galleries') ? tags['Microsoft.Compute/galleries'] : {}
+  tags: tags[?'Microsoft.Compute/galleries'] ?? {}
 }
 
 resource image 'Microsoft.Compute/galleries/images@2022-01-03' = {
   parent: gallery
   name: imageDefinitionName
   location: location
-  tags: contains(tags, 'Microsoft.Compute/galleries') ? tags['Microsoft.Compute/galleries'] : {}
+  tags: tags[?'Microsoft.Compute/galleries'] ?? {}
   properties: {
     osType: 'Windows'
     osState: 'Generalized'
