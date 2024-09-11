@@ -99,7 +99,7 @@ var Roles = [
 resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = if (!existingResourceGroup) {
   name: resourceGroupName
   location: location
-  tags: contains(tags, 'Microsoft.Resources/resourceGroups') ? tags['Microsoft.Resources/resourceGroups'] : {}
+  tags: tags[?'Microsoft.Resources/resourceGroups'] ?? {}
   properties: {}
 }
 
@@ -117,15 +117,12 @@ resource roleDefinitions 'Microsoft.Authorization/roleDefinitions@2015-07-01' = 
 
 module userAssignedIdentity 'modules/userAssignedIdentity.bicep' = {
   name: 'UserAssignedIdentity_${timestamp}'
-  scope: resourceGroup(resourceGroupName)
+  scope: rg
   params: {
     location: location
     name: userAssignedIdentityName
     tags: tags
   }
-  dependsOn: [
-    rg
-  ]
 }
 
 @batchSize(1)
@@ -143,7 +140,7 @@ module roleAssignments 'modules/roleAssignment.bicep' = [for i in range(0, lengt
 
 module computeGallery 'modules/computeGallery.bicep' = {
   name: 'ComputeGallery_${timestamp}'
-  scope: resourceGroup(resourceGroupName)
+  scope: rg
   params: {
     computeGalleryName: computeGalleryName
     imageDefinitionName: imageDefinitionName
@@ -156,14 +153,11 @@ module computeGallery 'modules/computeGallery.bicep' = {
     imageDefinitionIsAcceleratedNetworkSupported: imageDefinitionIsAcceleratedNetworkSupported
     imageDefinitionIsHibernateSupported: imageDefinitionIsHibernateSupported
   }
-  dependsOn: [
-    rg
-  ]
 }
 
 module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) && !(empty(existingVirtualNetworkResourceId))) {
   name: 'NetworkPolicy_${timestamp}'
-  scope: resourceGroup(resourceGroupName)
+  scope: rg
   params: {
     deploymentScriptName: deploymentScriptName
     location: location
@@ -175,14 +169,13 @@ module networkPolicy 'modules/networkPolicy.bicep' = if (!(empty(subnetName)) &&
     virtualNetworkResourceGroupName: split(existingVirtualNetworkResourceId, '/')[4]
   }
   dependsOn: [
-    rg
     roleAssignments
   ]
 }
 
-module storage 'modules/storageAccount.bicep' = {
+module storage 'modules/storageAccount.bicep' = if (!empty(storageAccountName)) {
   name: 'StorageAccount_${timestamp}'
-  scope: resourceGroup(resourceGroupName)
+  scope: rg
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -190,7 +183,4 @@ module storage 'modules/storageAccount.bicep' = {
     userAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
     userAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
   }
-  dependsOn: [
-    rg
-  ]
 }
